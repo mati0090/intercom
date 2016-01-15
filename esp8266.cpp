@@ -1,19 +1,36 @@
 #include "esp8266.h"
 
-#define DEFAULT_TIMEOUT 1000
+#define DEFAULT_TIMEOUT 10000
+#define BUFF_SIZE 255
+
+#define DEBUG 1
 
 boolean ESP8266::sendCommand(String command, char *requiredResponse) {
   String response;
+
+  #ifdef DEBUG
+  Serial.print(command);
+  #endif
+  
   Serial1.println(command);
 
-  if(response = Serial1.readString()){
-    if(response.indexOf(requiredResponse) >= 0){
-      return true;
-    } else {
-      logUnexpectedResponse(command, requiredResponse, response);
-      return false;
+  long int time = millis();
+  while ( (time + DEFAULT_TIMEOUT) > millis()) {
+    if(Serial1.available()) {
+      response+=(char)Serial1.read();
+
+      if(response.indexOf(requiredResponse) >= 0){
+        #ifdef DEBUG
+        Serial.println(" [OK]");
+        #endif
+        return true;
+      }
     }
   }
+  
+  #ifdef DEBUG
+  logUnexpectedResponse(command, requiredResponse, response);
+  #endif
   
   return false;
 }
@@ -22,11 +39,18 @@ boolean ESP8266::prepareModule(){
   sendCommand("AT+RST", "ready");
 }
 
-boolean ESP8266::connectToAP(String essid, String password){
-  sendCommand("AT+CWMODE=3", "OK");
+boolean ESP8266::connectToAP(String ssid, String password){
+  sendCommand("AT+CWMODE=1", "OK");
+  
+  char command[BUFF_SIZE];
+
+  sprintf(command, "AT+CWJAP=\"%s\",\"%s\"", ssid.c_str(), password.c_str());
+
+  sendCommand(command, "WIFI GOT IP kupa");
 }
 
 void ESP8266::logUnexpectedResponse(String command, char *requiredResponse, String response){
+  Serial.println();
   Serial.println("==== UNEXPECTED RESPONSE =====");
   Serial.println("Expected:");
   Serial.println(requiredResponse);
@@ -36,6 +60,7 @@ void ESP8266::logUnexpectedResponse(String command, char *requiredResponse, Stri
   }else{
     Serial.println(response);
   }
+  Serial.println("==============================");
 }
 
 
