@@ -1,11 +1,12 @@
 
+#include "config.h"
 #include "esp8266.h"
 
-// These are the SSID and PASSWORD to connect to your Wifi Network
-#define SSID  ""
-#define PASS  ""
-
 ESP8266 wifi;
+
+void dataReceiveCallback(char *data){
+  Serial.println(data);
+}
 
 void setup() { 
   Serial.begin(115200);
@@ -19,7 +20,7 @@ void setup() {
 }
 
 void loop() {
-  
-
+  wifi.handleIncomingData(&dataReceiveCallback);
 }
+
 

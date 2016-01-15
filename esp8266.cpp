@@ -1,9 +1,6 @@
 #include "esp8266.h"
 
-#define DEFAULT_TIMEOUT 10000
 #define BUFF_SIZE 255
-
-#define DEBUG 1
 
 boolean ESP8266::sendCommand(String command, char *requiredResponse) {
   String response;
@@ -60,6 +57,21 @@ boolean ESP8266::startTCPServer(int port){
 
   sendCommand(command, "OK");
   sendCommand("AT+CIPSTO=10", "OK");
+}
+
+void ESP8266::handleIncomingData(DataCallback dataCallback){
+  char buff[BUFF_SIZE] = "\0";
+  int index=0;
+
+  while (Serial1.available()) {
+    buff[index] = (char)Serial1.read();  
+    index++;
+    delay(5);
+  }
+
+  if(index != 0){
+    dataCallback(buff);
+  }
 }
 
 void ESP8266::logUnexpectedResponse(String command, char *requiredResponse, String response){
