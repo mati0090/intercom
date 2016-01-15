@@ -7,13 +7,14 @@
 
 boolean ESP8266::sendCommand(String command, char *requiredResponse) {
   String response;
-
+  
   #ifdef DEBUG
   Serial.print(command);
   #endif
   
   Serial1.println(command);
 
+  //sometimes we need to wait few seconds for response
   long int time = millis();
   while ( (time + DEFAULT_TIMEOUT) > millis()) {
     if(Serial1.available()) {
@@ -41,12 +42,24 @@ boolean ESP8266::prepareModule(){
 
 boolean ESP8266::connectToAP(String ssid, String password){
   sendCommand("AT+CWMODE=1", "OK");
+  sendCommand("AT+CWQAP", "OK");
   
   char command[BUFF_SIZE];
 
   sprintf(command, "AT+CWJAP=\"%s\",\"%s\"", ssid.c_str(), password.c_str());
 
-  sendCommand(command, "WIFI GOT IP kupa");
+  sendCommand(command, "OK");
+}
+
+boolean ESP8266::startTCPServer(int port){
+  sendCommand("AT+CIPMUX=1", "OK"); // configure for multiple connections
+  
+  char command[BUFF_SIZE];
+
+  sprintf(command, "AT+CIPSERVER=1,%d", port);
+
+  sendCommand(command, "OK");
+  sendCommand("AT+CIPSTO=10", "OK");
 }
 
 void ESP8266::logUnexpectedResponse(String command, char *requiredResponse, String response){

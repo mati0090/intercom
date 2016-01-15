@@ -2,8 +2,8 @@
 #include "esp8266.h"
 
 // These are the SSID and PASSWORD to connect to your Wifi Network
-#define SSID  "ASUS-6E80"
-#define PASS  "dudekppg"
+#define SSID  ""
+#define PASS  ""
 
 ESP8266 wifi;
 
@@ -13,10 +13,9 @@ void setup() {
 
   while(!Serial);
 
-  Serial.println("Hello!");
-
   wifi.prepareModule();
-  wifi.connectToAP(SSID, PASS);  
+  wifi.connectToAP(SSID, PASS);
+  wifi.startTCPServer(666);
 }
 
 void loop() {
