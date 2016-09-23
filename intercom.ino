@@ -1,8 +1,10 @@
 
 #include "config.h"
 #include "esp8266.h"
+#include "beeper.h"
 
 ESP8266 wifi;
+Beeper beeper;
 
 void dataReceiveCallback(char *data){
   Serial.println(data);
