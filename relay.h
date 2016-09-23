@@ -1,10 +1,9 @@
 #include <Arduino.h>
 #include "config.h"
 
-class Beeper {
+class Relay {
 public:
-  Beeper();
+  Relay();
   void on();
   void off();
 };
-  

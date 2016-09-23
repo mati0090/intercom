@@ -1,7 +1,5 @@
 #include "esp8266.h"
 
-#define BUFF_SIZE 255
-
 boolean ESP8266::sendCommand(String command, char *requiredResponse) {
   String response;
   
